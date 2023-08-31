@@ -57,6 +57,24 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+uint32_t  N=0;
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if(htim == &htim4)
+    {
+        printf("Freq: %lu\n", N);
+        N = 0;
+    }
+
+}
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef  *htim)
+{
+    if(htim == &htim4)
+    {
+        N++;
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -89,8 +107,14 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
+  HAL_TIM_IC_Start_IT(&htim4,TIM_CHANNEL_1);
+
+  // NOTE: 防止立即进入中断
+  __HAL_TIM_CLEAR_FLAG(&htim4,TIM_FLAG_UPDATE);
+  __HAL_TIM_ENABLE_IT(&htim4, TIM_IT_UPDATE);
 
   /* USER CODE END 2 */
 
@@ -99,6 +123,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
 
     /* USER CODE BEGIN 3 */
   }
